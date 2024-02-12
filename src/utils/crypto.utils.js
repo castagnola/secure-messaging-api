@@ -20,6 +20,28 @@ exports.generateKeyPair = () => {
     return { publicKey, privateKey };
 };
 
+// Paso ?: función signMessage
+exports.signMessage = (message, privateKey) => {
+    try {
+        const sign = crypto.sign("SHA256", Buffer.from(message), privateKey);
+        return sign;
+    } catch (error) {
+        console.error('Error during encryption:', error.message);
+        throw error;
+    }
+};
+
+// Paso ?: función signMessage
+exports.verifySign = (message, publicKey, signature) => {
+    try {
+        const sign = crypto.verify("SHA256", Buffer.from(message), publicKey, Buffer.from(signature, 'base64'));
+        return sign;
+    } catch (error) {
+        console.error('Error during encryption:', error.message);
+        throw error;
+    }
+};
+
 // Paso 3: función encryptMessage
 exports.encryptMessage = (message, publicKey) => {
     try {
@@ -46,7 +68,7 @@ exports.decryptMessage = (encryptedMessage, privateKey) => {
                 key: privateKey,
                 padding: crypto.constants.RSA_PKCS1_PADDING
             },
-            encryptedMessage
+            Buffer.from(encryptedMessage, 'base64')
         );
         return decryptedData.toString();
     } catch (error) {
