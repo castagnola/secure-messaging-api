@@ -20,6 +20,32 @@ const postMessage = (body, res) => {
     }
 };
 
+const postFile = async (body, res) => {
+    const { from, to, file: { filename } } = body;
+    try {
+        // Obtener claves de los usuarios
+        const sender = login(from);
+        const receiver = login(to);
+        const chunks = await streamToBuffer(filename);
+        const encryptedChunks = [];
+        for (let chunk of chunks) {
+            chunk = chunk.toString();
+            encryptedChunks.push({
+                signature: signMessage(chunk, sender.privateKey).toString('base64'),
+                encryptedMessage: encryptMessage(chunk, receiver.publicKey).toString('base64')
+            });
+        };
+
+
+        //writeMessage(from, to, encryptedMessage, signature);
+        await writeChunks(from, to, encryptedChunks);
+        res.json({ encryptedMessage, signature });
+    } catch (error) {
+        console.error(error)
+
+    }
+};
+
 const getMessage = (query, res) => {
     const { from, to } = query;
     try {
@@ -44,4 +70,5 @@ const getMessage = (query, res) => {
 module.exports = {
     postMessage,
     getMessage,
+    postFile,
 };
