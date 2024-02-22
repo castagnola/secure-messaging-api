@@ -1,7 +1,8 @@
 "use strict";
 
 const { encryptMessage, decryptMessage, signMessage, verifySign } = require("../utils/crypto.utils");
-const { writeMessage, readMessage } = require("../utils/messages.utils");
+const { writeMessage, readMessage, readChunks, writeChunks } = require("../utils/messages.utils");
+const { streamToBuffer } = require("../utils/stream.utils");
 const { login } = require("../utils/user.utils");
 // Paso 7 Ruta para enviar mensajes
 const postMessage = (body, res) => {
@@ -39,10 +40,9 @@ const postFile = async (body, res) => {
 
         //writeMessage(from, to, encryptedMessage, signature);
         await writeChunks(from, to, encryptedChunks);
-        res.json({ encryptedMessage, signature });
+        res.json({ message: 'The file has been uploaded and encrypted' });
     } catch (error) {
         console.error(error)
-
     }
 };
 
@@ -66,9 +66,35 @@ const getMessage = (query, res) => {
     }
 };
 
+const getFile = async (query, res) => {
+    const { from, to } = query;
+    try {
+        const sender = login(from);
+        const receiver = login(to);
+        const chunks = JSON.parse(await readChunks(from, to));
+
+        const decryptedChunks = [];
+        for (let chunk of chunks) {
+            const { encryptedMessage, signature } = chunk;
+            const decryptedChunk = decryptMessage(encryptedMessage, receiver.privateKey);
+            const verified = verifySign(decryptedChunk, sender.publicKey, signature);
+            if (verified) {
+                decryptedChunks.push(decryptedChunk);
+            } else {
+                throw 'Signature validation error';
+            }
+        };
+        const decryptedFile = decryptedChunks.join('');
+        res.attachment('sample.txt').send(decryptedFile);
+    } catch (error) {
+        console.error(error);
+        res.status(401).end();
+    }
+};
 
 module.exports = {
     postMessage,
     getMessage,
     postFile,
+    getFile,
 };

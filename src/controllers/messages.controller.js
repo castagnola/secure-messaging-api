@@ -10,6 +10,10 @@ const postFile = (_req = request, _res = response) => {
     return messagesService.postFile({ file: _req.file, ..._req.body }, _res);
 };
 
+const getFile = (_req = request, _res = response) => {
+    return messagesService.getFile(_req.query, _res);
+};
+
 const getMessage = (_req = request, _res = response) => {
     return messagesService.getMessage(_req.query, _res);
 };
@@ -18,4 +22,5 @@ module.exports = {
     postMessage,
     getMessage,
     postFile,
+    getFile,
 }

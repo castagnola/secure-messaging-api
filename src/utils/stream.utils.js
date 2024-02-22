@@ -7,9 +7,13 @@ async function streamToBuffer(fileName) {
     return new Promise((resolve, reject) => {
         const chunks = [];
         readableStream.on('data', data => { chunks.push(data); });
-        readableStream.on('end', () => { resolve(chunks); });
+        readableStream.on('end', async () => {
+            await fs.promises.unlink(filePath);
+            resolve(chunks);
+        });
         readableStream.on('error', reject);
     });
+
 }
 
 module.exports = {
