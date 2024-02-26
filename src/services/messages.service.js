@@ -36,8 +36,6 @@ const postFile = async (body, res) => {
                 encryptedMessage: encryptMessage(chunk, receiver.publicKey).toString('base64')
             });
         };
-
-
         //writeMessage(from, to, encryptedMessage, signature);
         await writeChunks(from, to, encryptedChunks);
         res.json({ message: 'The file has been uploaded and encrypted' });
