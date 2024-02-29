@@ -12,34 +12,20 @@ git clone https://github.com/castagnola/secure-messaging-api.git <project-name>
 ```sh
 cd <project-name>
 ```
-3. Correr modulos de node:
+3. Ubicarse en la rama inicial del proyecto:
+   
+```sh
+git switch initial-branch
+```
+3. Instalar dempendencias de node:
 
 ```sh
 npm install
 ```
-4. Correr aplicacion:
 
+4. Correr el comando
 ```sh
-node src/app.js
-```
-5. Servidor
-```sh
-Server is running on port 8000
-```
-6. Correr con script
-
-   - modificar la seccion de scripts en el `package.json` 
-
-```json
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js" 
-  },
-```
-7. Correr el comando
-
-```sh
-npm start
+npm run dev
 ```
 ```sh
 > secure-messaging-api@1.0.0 start
