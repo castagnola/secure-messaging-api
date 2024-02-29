@@ -1,6 +1,7 @@
 "use strict";
 const { Worker } = require('worker_threads');
 const { encryptMessage, decryptMessage, signMessage, verifySign } = require("../utils/crypto.utils");
+const { saveChunks } = require('../utils/file.utils');
 const { writeMessage, readMessage, readChunks, writeChunks } = require("../utils/messages.utils");
 const { streamToBuffer } = require('../utils/stream.utils');
 const { login } = require("../utils/user.utils");
@@ -34,19 +35,18 @@ const postFile = async (body, res) => {
             workerData: {
                 sender,
                 receiver,
-                chunks,
-                threadCount: THREAD_COUNT
+                chunks
             }
         });
 
         worker.on("message", async (data) => { // El evento 'message' es emitido para cualquier mensaje entrante, que contenga el input clonada de port.postMessage().
-            //writeMessage(from, to, data.encryptedMessage, data.signature);
-            await writeChunks(from, to, data);
+            await saveChunks(from, to, data); // replazar por el writeChunks
+            //await writeChunks(from, to, data);
             res.json({ message: 'The file has been uploaded and encrypted' });
         });
 
         worker.on("error", (error) => {
-            res.status(404).send(`An error occured ${error}`);
+            res.status(500).send(`An error occured ${error}`);
         });
     } catch (error) {
         console.error(error)
