@@ -47,7 +47,7 @@ const signMessage = (message, privateKey) => {
 
 const verifySign = (message, publicKey, signature) => {
     try {
-        const verify = crypto.verify("SHA256", Buffer.from(message), publicKey);
+        const verify = crypto.verify("SHA256", Buffer.from(message), publicKey, Buffer.from(signature, 'base64'));
         return verify;
 
     } catch (error) {
