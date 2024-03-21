@@ -1,6 +1,9 @@
 const crypto = require("crypto");
 
-
+/**
+ * generacion de claves
+ * @returns 
+ */
 const generateKeyPair = () => {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
@@ -16,6 +19,12 @@ const generateKeyPair = () => {
     return { publicKey, privateKey }
 }
 
+/**
+ * Cifrar 
+ * @param {*} message 
+ * @param {*} publicKey 
+ * @returns 
+ */
 const encryptMessage = (message, publicKey) => {
     try {
 
@@ -33,6 +42,31 @@ const encryptMessage = (message, publicKey) => {
     }
 }
 
+const decryptMessage = (encryptedMessage, privateKey) => {
+    try {
+        const decryptedData = crypto.privateDecrypt(
+            {
+                key: privateKey,
+                padding: crypto.constants.RSA_PKCS1_PADDING
+            },
+            Buffer.from(encryptedMessage, 'base64')
+        );
+
+        return decryptedData.toString();
+
+    } catch (error) {
+
+        console.error(`Error during decryptMessage`, error.message);
+        throw error
+    }
+}
+
+/**
+ * generar firma al mensaje
+ * @param {*} message 
+ * @param {*} privateKey 
+ * @returns 
+ */
 const signMessage = (message, privateKey) => {
     try {
         const sign = crypto.sign("SHA256", Buffer.from(message), privateKey);
@@ -45,6 +79,13 @@ const signMessage = (message, privateKey) => {
     }
 }
 
+/**
+ * Generar verificacion de la firma
+ * @param {*} message 
+ * @param {*} publicKey 
+ * @param {*} signature 
+ * @returns 
+ */
 const verifySign = (message, publicKey, signature) => {
     try {
         const verify = crypto.verify("SHA256", Buffer.from(message), publicKey, Buffer.from(signature, 'base64'));
@@ -60,6 +101,7 @@ const verifySign = (message, publicKey, signature) => {
 module.exports = {
     generateKeyPair,
     encryptMessage,
+    decryptMessage,
     signMessage,
     verifySign
 

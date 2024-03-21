@@ -1,10 +1,10 @@
 "use strict";
 const express = require("express");
-const { postMessage } = require("../controllers/messages.controller");
+const { postMessage, getMessage } = require("../controllers/messages.controller");
 
 const router = express.Router();
 
 router.post('/', postMessage);
-router.get('/');
+router.get('/', getMessage);
 
 module.exports = router;
